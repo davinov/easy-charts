@@ -104,6 +104,7 @@ export function Axis({ placeholder, onColumnChange, scale, orientation }: AxisPr
     >
       {scale.domain().map((label) => (
         <AxisLabel
+          key={label}
           $orientation={orientation}
           $width={scale.bandwidth()}
           $position={scale(label)}

@@ -19,6 +19,14 @@ export default {
       type: ColumnType.NUMERIC,
     },
     {
+      name: "bugsCreatedLastYear",
+      type: ColumnType.NUMERIC,
+    },
+    {
+      name: "bugsCreatedThisYear",
+      type: ColumnType.NUMERIC,
+    },
+    {
       name: "height",
       type: ColumnType.NUMERIC,
     },
@@ -34,6 +42,8 @@ export default {
       lastname: "Parfait",
       age: 29,
       height: 190,
+      bugsCreatedLastYear: 12,
+      bugsCreatedThisYear: 10,
       birthdate: new Date("1994-01-01"),
     },
     {
@@ -42,6 +52,8 @@ export default {
       lastname: "Zaouali",
       age: 27,
       height: 165,
+      bugsCreatedLastYear: 25,
+      bugsCreatedThisYear: 25,
       birthdate: new Date("1995-01-01"),
     },
     {
@@ -50,6 +62,8 @@ export default {
       lastname: "Nowinsky",
       age: 31,
       height: 177,
+      bugsCreatedLastYear: 7,
+      bugsCreatedThisYear: 20,
       birthdate: new Date("1991-01-01"),
     },
   ],

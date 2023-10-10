@@ -40,9 +40,10 @@ const ChartDiv = styled.div`
 `;
 
 interface ChartConfig {
-    x?: string;
-    y?: string;
-    value?: string;
+  x?: string;
+  y?: string;
+  value?: string;
+  comparison?: string;
 }
 
 function generateScaleBand(dataWithSchema: DataWithSchema, column?: string) {
@@ -105,6 +106,13 @@ export function Chart({ dataWithSchema }: ChartProps) {
     });
   }
 
+  function handleVerticalBarsNewColumn() {
+    setChartConfig({
+      ...chartConfig,
+      comparison: currentDraggedColumn?.name,
+    });
+  }
+
   const xColumn = chartConfig.x;
   const xScale = useMemo(() => generateScaleBand(dataWithSchema, xColumn), [
     dataWithSchema,
@@ -149,7 +157,9 @@ export function Chart({ dataWithSchema }: ChartProps) {
               xScale={xScale}
               valueScale={valueScale}
               valueColumn={chartConfig.value}
+              comparisonColumn={chartConfig.comparison}
               onColumnChange={handleVerticalBarsColumnChange}
+              onNewBarsColumn={handleVerticalBarsNewColumn}
             />
           )}
         </GraphValuesContainer>
