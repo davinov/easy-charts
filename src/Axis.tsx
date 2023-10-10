@@ -1,23 +1,25 @@
 import { CurrentColumnDraggedContext } from "./ColumDraggedProvider";
 import styled, { css } from "styled-components";
 import { useContext, useState } from "react";
-import { ScaleBand, scaleBand, scaleOrdinal } from 'd3-scale';
+import { ScaleBand } from 'd3-scale';
 
-const AxisDropZone = styled.div<{ $isDraggedOver: boolean }>`
-  ${(props) =>
-    props.$isDraggedOver &&
+
+function applyIsDraggedOverStyle(props: { $isDraggedOver: boolean }) {
+  return props.$isDraggedOver &&
     css`
       background: orange;
       color: yellow;
-    `}
-`
+    `;
+}
 
-const AxisPlaceholder = styled(AxisDropZone)`
+const AxisPlaceholder = styled.div<{ $isDraggedOver: boolean }>`
   background: lightgray;
   display: flex;
   align-items: center;
   justify-content: center;
   color: black;
+
+  ${applyIsDraggedOverStyle}
 `;
 
 export enum AxisOrientation {
@@ -33,10 +35,12 @@ interface AxisProps {
   orientation: AxisOrientation;
 }
 
-const AxisLabelsContainer = styled(AxisDropZone)`
+const AxisLabelsContainer = styled.div<{ $isDraggedOver: boolean }>`
   display: flex;
   flex-direction: row;
   position: relative;
+
+  ${applyIsDraggedOverStyle}
 `;
 
 const AxisLabel = styled.div<{
@@ -68,11 +72,11 @@ export function Axis({ placeholder, onColumnChange, scale, orientation }: AxisPr
 
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
   function handleDrop() {
+    setIsDraggedOver(false);
     if (!currentDraggedColumn) {
       return;
     }
     onColumnChange(currentDraggedColumn.name);
-    setIsDraggedOver(false);
   }
 
   function handleDragOver(event) {

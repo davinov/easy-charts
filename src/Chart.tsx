@@ -1,9 +1,11 @@
-import styled, {css} from 'styled-components';
+import styled from 'styled-components';
 import { CurrentColumnDraggedContext } from './ColumDraggedProvider';
 import { Axis, AxisOrientation } from './Axis';
-import { ReactNode, useContext, useMemo, useState } from 'react';
-import { scaleBand, scaleOrdinal } from 'd3-scale';
+import { useContext, useMemo, useState } from 'react';
+import { scaleBand, scaleLinear } from 'd3-scale';
 import { ColumnType } from './column-type';
+import { VerticalBars } from './VerticalBars';
+import { DataWithSchema } from './types';
 
 
 const OrthonormalLayout = styled.div`
@@ -27,37 +29,23 @@ const YAxisContainer = styled.div`
   text-orientation: upright;
 `;
 
-const BarChart = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    margin: 20px;
+const GraphValuesContainer = styled.div`
+  grid-area: 1 / 2 / 2 / 3;
 `;
 
 const ChartDiv = styled.div`
     width: 100%;
     border: 1px solid grey;
     margin-left: 20px;
-`
-const Bar = styled.div`
-    width: 50%;
-    height: ${({ height }) => height}px;
-    background-color: ${({ color }) => color};
-    margin-left: 5%;
-    margin-right: 5%;
 `;
 
 interface ChartConfig {
     x?: string;
     y?: string;
+    value?: string;
 }
 
-interface DataWithSchema {
-    schema: {name: string; type: ColumnType}[];
-    data: {[col: string]: string | number | Date }[];
-}
-
-function generateScale(dataWithSchema: DataWithSchema, column?: string) {
+function generateScaleBand(dataWithSchema: DataWithSchema, column?: string) {
     if (!column) {
         return;
     }
@@ -66,7 +54,23 @@ function generateScale(dataWithSchema: DataWithSchema, column?: string) {
 
     if (type === ColumnType.TEXT) {
         const values = dataWithSchema.data.map((d) => d[column]) as string[];
-        return scaleBand([0, 100]).domain(values);
+        return scaleBand([0, 100]).domain(values).paddingOuter(0.1).paddingInner(0.1);
+    }
+}
+
+function generateScaleLinear(dataWithSchema: DataWithSchema, column?: string) {
+    if (!column) {
+        return;
+    }
+
+    const type = dataWithSchema.schema.find((c) => c.name === column)?.type;
+
+    if (type === ColumnType.NUMERIC) {
+        const values = dataWithSchema.data.map((d) => d[column]) as number[];
+        return scaleLinear([0, 100]).domain([
+          Math.min(0, ...values),
+          Math.max(0, ...values),
+        ]);
     }
 }
 
@@ -94,15 +98,28 @@ export function Chart({ dataWithSchema }: ChartProps) {
     });
   }
 
-  const xScale = useMemo(() => generateScale(dataWithSchema, chartConfig.x), [
+  function handleVerticalBarsColumnChange() {
+    setChartConfig({
+        ...chartConfig,
+        value: currentDraggedColumn?.name,
+    });
+  }
+
+  const xColumn = chartConfig.x;
+  const xScale = useMemo(() => generateScaleBand(dataWithSchema, xColumn), [
     dataWithSchema,
-    chartConfig.x,
+    xColumn,
   ]);
 
-  const yScale = useMemo(() => generateScale(dataWithSchema, chartConfig.y), [
+  const yScale = useMemo(() => generateScaleBand(dataWithSchema, chartConfig.y), [
     dataWithSchema,
     chartConfig.y,
   ]);
+
+  const valueScale = useMemo(
+    () => generateScaleLinear(dataWithSchema, chartConfig.value),
+    [dataWithSchema, chartConfig.value]
+  );
 
   return (
     <ChartDiv>
@@ -124,28 +141,19 @@ export function Chart({ dataWithSchema }: ChartProps) {
             scale={yScale}
           />
         </YAxisContainer>
+        <GraphValuesContainer>
+          {xColumn && xScale && !yScale && (
+            <VerticalBars
+              data={dataWithSchema.data}
+              xColumn={xColumn}
+              xScale={xScale}
+              valueScale={valueScale}
+              valueColumn={chartConfig.value}
+              onColumnChange={handleVerticalBarsColumnChange}
+            />
+          )}
+        </GraphValuesContainer>
       </OrthonormalLayout>
-
-      {/* <BarChart>
-                {data.map(item => (
-                    <Bar
-                        key={item.name}
-                        height={item.age / maxAge * 200}
-                        color="#00C4FF"
-                    />
-                ))}
-            </BarChart>
-
-            <YAxis>
-                {Array.from({ length: 5 }, (_, index) => maxAge / 5 * (5 - index)).map(value => (
-                    <div key={value}>{value}</div>
-                ))}
-            </YAxis>
-            <XAxis>
-                {data.map(item => (
-                    <div key={item.name}>{item.name}</div>
-                ))}
-            </XAxis> */}
     </ChartDiv>
   );
 }
