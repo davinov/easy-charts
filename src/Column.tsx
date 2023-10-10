@@ -7,8 +7,8 @@ export interface ColumnProps {
 
 export function Column({column, type}: ColumnProps) {
     return (
-      <div>
-        {column} / {type}
+      <div style={{textAlign: "left"}}>
+        {column}: {type}
       </div>
     );
 }

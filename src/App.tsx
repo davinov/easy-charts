@@ -1,10 +1,9 @@
 import './App.css'
 import { ColumnsList } from './ColumnsList'
 import { Chart } from './Chart'
-
 import SAMPLE_DATA from './datasets/sample-data';
-
 import styled from "styled-components";
+
 const ChartEditorLayout = styled.div`
   height: 100%;
   width: 100%;
@@ -12,17 +11,18 @@ const ChartEditorLayout = styled.div`
   flex-direction: row;
 `;
 
-
-
 function App() {
 
-
-  return (
+  return <>
     <ChartEditorLayout>
-      <ColumnsList columns={SAMPLE_DATA.schema}></ColumnsList>
-      <Chart></Chart>
+      <ColumnsList
+          columns={SAMPLE_DATA.schema}
+      ></ColumnsList>
+      <Chart
+          data={SAMPLE_DATA.data}
+      ></Chart>
     </ChartEditorLayout>
-  );
+ </>;
 }
 
 export default App
