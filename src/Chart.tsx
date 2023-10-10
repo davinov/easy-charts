@@ -1,5 +1,6 @@
 import styled, {css} from 'styled-components';
 import { CurrentColumnDraggedContext } from './ColumDraggedProvider';
+import { Axis } from './Axis';
 import { ReactNode, useContext, useState } from 'react';
 
 
@@ -14,47 +15,14 @@ const OrthonormalLayout = styled.div`
 `;
 
 
-const AxisPlaceholderStyled = styled.div<{ $isDraggedOver: boolean; }>`
-  background: lightgray;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: black;
-
-  ${(props) =>
-    props.$isDraggedOver &&
-    css`
-      background: orange;
-      color: yellow;
-    `}
+const XAxisContainer = styled.div`
+    grid-area: 2 / 2 / 3 / 3;
 `;
 
-const XAxisPlaceholder = styled(AxisPlaceholderStyled)`
-  grid-area: 2 / 2 / 3 / 3;
-`;
-
-const YAxisPlaceholder = styled(AxisPlaceholderStyled)`
+const YAxisContainer = styled.div`
   grid-area: 1 / 1 / 2 / 2;
   writing-mode: vertical-lr;
   text-orientation: upright;
-`;
-
-const XAxis = styled.div`
-    display: flex;
-    justify-content: space-between;
-    margin: 0 20px;
-    font-size: 12px;
-    color: #999;
-`;
-
-const YAxis = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    padding: 20px 0;
-    margin-right: 20px;
-    font-size: 12px;
-    color: #999;
 `;
 
 const BarChart = styled.div`
@@ -86,35 +54,32 @@ export function Chart({data}) {
     const [currentDraggedColumn] = useContext(CurrentColumnDraggedContext)
     // const maxAge = Math.max(...data.map(item => item.age));
 
-    const [isDraggedOver, setIsDraggedOver]= useState<boolean>(false);
-    function handleDrop() {
-        setChartConfig({
-            ...chartConfig,
-            x: currentDraggedColumn?.name,
-        });
-        setIsDraggedOver(false);
-    }
-
-    function handleDragOver(event) {
-        event.preventDefault();
-        setIsDraggedOver(true);
-    }
-
     const [chartConfig, setChartConfig] = useState<ChartConfig>({});
+    
+    function setXAxisColumn() {
+      setChartConfig({
+        ...chartConfig,
+        x: currentDraggedColumn?.name,
+      });
+    }
+
+    function setYAxisColumn() {
+      setChartConfig({
+        ...chartConfig,
+        y: currentDraggedColumn?.name,
+      });
+    }
 
     return (
       <ChartDiv>
         <div>{JSON.stringify(chartConfig)}</div>
         <OrthonormalLayout>
-          <YAxisPlaceholder>Y axis</YAxisPlaceholder>
-          <XAxisPlaceholder
-            $isDraggedOver={isDraggedOver}
-            onDragOver={handleDragOver}
-            onDragLeave={() => setIsDraggedOver(false)}
-            onDrop={handleDrop}
-          >
-            X axis
-          </XAxisPlaceholder>
+          <XAxisContainer>
+            <Axis placeholder="X axis" onColumnChange={setXAxisColumn} />
+          </XAxisContainer>
+          <YAxisContainer>
+            <Axis placeholder="Y axis" onColumnChange={setYAxisColumn} />
+          </YAxisContainer>
         </OrthonormalLayout>
 
         {/* <BarChart>
