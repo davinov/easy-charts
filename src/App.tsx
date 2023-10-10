@@ -3,6 +3,9 @@ import { ColumnsList } from './ColumnsList'
 import { Chart } from './Chart'
 import SAMPLE_DATA from './datasets/sample-data';
 import styled from "styled-components";
+import { useState } from 'react';
+import { CurrentColumnDraggedContext } from './ColumDraggedProvider';
+import { ColumnProps } from './Column';
 
 const ChartEditorLayout = styled.div`
   height: 100%;
@@ -12,17 +15,21 @@ const ChartEditorLayout = styled.div`
 `;
 
 function App() {
-
-  return <>
-    <ChartEditorLayout>
-      <ColumnsList
-          columns={SAMPLE_DATA.schema}
-      ></ColumnsList>
-      <Chart
-          data={SAMPLE_DATA.data}
-      ></Chart>
-    </ChartEditorLayout>
- </>;
+  const [currentDraggedColumn, setCurrentDraggedColumn] =
+  useState<ColumnProps | null>(null);
+  
+  return (
+    <>
+      <ChartEditorLayout>
+        <CurrentColumnDraggedContext.Provider
+          value={[currentDraggedColumn, setCurrentDraggedColumn]}
+        >
+          <ColumnsList columns={SAMPLE_DATA.schema}></ColumnsList>
+          <Chart data={SAMPLE_DATA.data}></Chart>
+        </CurrentColumnDraggedContext.Provider>
+      </ChartEditorLayout>
+    </>
+  );
 }
 
 export default App

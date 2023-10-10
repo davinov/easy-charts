@@ -1,4 +1,43 @@
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
+import { CurrentColumnDraggedContext } from './ColumDraggedProvider';
+import { ReactNode, useContext, useState } from 'react';
+
+
+const OrthonormalLayout = styled.div`
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  grid-template-rows: 1fr 50px;
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+`;
+
+
+const AxisPlaceholderStyled = styled.div<{ $isDraggedOver: boolean; }>`
+  background: lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+
+  ${(props) =>
+    props.$isDraggedOver &&
+    css`
+      background: orange;
+      color: yellow;
+    `}
+`;
+
+const XAxisPlaceholder = styled(AxisPlaceholderStyled)`
+  grid-area: 2 / 2 / 3 / 3;
+`;
+
+const YAxisPlaceholder = styled(AxisPlaceholderStyled)`
+  grid-area: 1 / 1 / 2 / 2;
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+`;
 
 const XAxis = styled.div`
     display: flex;
@@ -38,13 +77,47 @@ const Bar = styled.div`
     margin-right: 5%;
 `;
 
-export function Chart({data}) {
+interface ChartConfig {
+    x?: string;
+    y?: string;
+}
 
-    const maxAge = Math.max(...data.map(item => item.age));
+export function Chart({data}) {
+    const [currentDraggedColumn] = useContext(CurrentColumnDraggedContext)
+    // const maxAge = Math.max(...data.map(item => item.age));
+
+    const [isDraggedOver, setIsDraggedOver]= useState<boolean>(false);
+    function handleDrop() {
+        setChartConfig({
+            ...chartConfig,
+            x: currentDraggedColumn?.name,
+        });
+        setIsDraggedOver(false);
+    }
+
+    function handleDragOver(event) {
+        event.preventDefault();
+        setIsDraggedOver(true);
+    }
+
+    const [chartConfig, setChartConfig] = useState<ChartConfig>({});
 
     return (
-        <ChartDiv>
-            <BarChart>
+      <ChartDiv>
+        <div>{JSON.stringify(chartConfig)}</div>
+        <OrthonormalLayout>
+          <YAxisPlaceholder>Y axis</YAxisPlaceholder>
+          <XAxisPlaceholder
+            $isDraggedOver={isDraggedOver}
+            onDragOver={handleDragOver}
+            onDragLeave={() => setIsDraggedOver(false)}
+            onDrop={handleDrop}
+          >
+            X axis
+          </XAxisPlaceholder>
+        </OrthonormalLayout>
+
+        {/* <BarChart>
                 {data.map(item => (
                     <Bar
                         key={item.name}
@@ -63,7 +136,7 @@ export function Chart({data}) {
                 {data.map(item => (
                     <div key={item.name}>{item.name}</div>
                 ))}
-            </XAxis>
-        </ChartDiv>
+            </XAxis> */}
+      </ChartDiv>
     );
 }

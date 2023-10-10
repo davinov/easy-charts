@@ -3,15 +3,15 @@ import { ColumnType } from "../column-type";
 export default {
   schema: [
     {
-      column: "name",
+      name: "name",
       type: ColumnType.TEXT,
     },
     {
-      column: "age",
+      name: "age",
       type: ColumnType.NUMERIC,
     },
     {
-      column: "birthdate",
+      name: "birthdate",
       type: ColumnType.DATE,
     },
   ],

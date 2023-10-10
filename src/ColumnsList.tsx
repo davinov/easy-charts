@@ -12,10 +12,7 @@ export function ColumnsList({ columns }: ColumnsListProps) {
       <div className="sidebar">
         <h2>Columns</h2>
         {columns.map((c, index) => (
-          <p key={index}>{c.name}</p>
-        ))}
-        {columns.map((c) => (
-          <Column key={c.id} {...c} />
+          <Column key={index} {...c} />
         ))}
       </div>
     </div>

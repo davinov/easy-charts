@@ -1,8 +1,10 @@
 import { ColumnEmoji, ColumnType } from "./column-type";
 import styled from "styled-components";
+import { useContext } from "react";
+import { CurrentColumnDraggedContext } from './ColumDraggedProvider';
 
 export interface ColumnProps {
-  column: string;
+  name: string;
   type: ColumnType;
 }
 
@@ -21,10 +23,20 @@ const ColumnItem = styled.div`
     }
 `;
 
-export function Column({column, type}: ColumnProps) {
-    return (
-      <ColumnItem>
-        {ColumnEmoji[type]} <b> {column}</b>
+export function Column(column: ColumnProps) {
+  const [_, setCurrentDraggedColumn] = useContext(CurrentColumnDraggedContext);
+
+  function handleDragStart() {
+    setCurrentDraggedColumn(column);
+  }
+
+  function handleDragEnd() {
+    setCurrentDraggedColumn(null);
+  }
+  
+  return (
+      <ColumnItem draggable onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        {ColumnEmoji[column.type]} <b> {column.name}</b>
       </ColumnItem>
     );
 }
