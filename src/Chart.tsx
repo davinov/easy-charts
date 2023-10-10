@@ -1,6 +1,6 @@
 import styled, {css} from 'styled-components';
 import { CurrentColumnDraggedContext } from './ColumDraggedProvider';
-import { Axis } from './Axis';
+import { Axis, AxisOrientation } from './Axis';
 import { ReactNode, useContext, useMemo, useState } from 'react';
 import { scaleBand, scaleOrdinal } from 'd3-scale';
 import { ColumnType } from './column-type';
@@ -99,15 +99,30 @@ export function Chart({ dataWithSchema }: ChartProps) {
     chartConfig.x,
   ]);
 
+  const yScale = useMemo(() => generateScale(dataWithSchema, chartConfig.y), [
+    dataWithSchema,
+    chartConfig.y,
+  ]);
+
   return (
     <ChartDiv>
       <div>{JSON.stringify(chartConfig)}</div>
       <OrthonormalLayout>
         <XAxisContainer>
-          <Axis placeholder="X axis" onColumnChange={setXAxisColumn} scale={xScale} />
+          <Axis
+            orientation={AxisOrientation.HORIZONTAL}
+            placeholder="X axis"
+            onColumnChange={setXAxisColumn}
+            scale={xScale}
+          />
         </XAxisContainer>
         <YAxisContainer>
-          <Axis placeholder="Y axis" onColumnChange={setYAxisColumn} />
+          <Axis
+            orientation={AxisOrientation.VERTICAL}
+            placeholder="Y axis"
+            onColumnChange={setYAxisColumn}
+            scale={yScale}
+          />
         </YAxisContainer>
       </OrthonormalLayout>
 
