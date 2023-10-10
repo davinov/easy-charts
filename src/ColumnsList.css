@@ -1,0 +1,15 @@
+.columns-list-wrapper {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  /* background-color: #f1f1f1; */
+  border: 1px dashed white;
+  padding: 10px;
+}
+
+.columns-list {
+  flex: 1;
+  padding: 10px;
+}
