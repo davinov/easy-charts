@@ -24,7 +24,7 @@ const Bar = styled.div<{ $isDraggedOver: boolean }>`
   ${(props) => {
     if (props.$isDraggedOver) {
       return css`
-        background-color: orange;
+        background-color: orange !important;
         opacity: 1 !important;
       `;
     }
@@ -123,7 +123,7 @@ export function VerticalBars({
             />
             {comparisonColumn && comparisonValue != null && (
               <ComparisonBar
-                $isDraggedOver={isDraggedOver}
+                $isDraggedOver={isDraggedOverNewBars}
                 onDragOver={handleDragOverNewBars}
                 onDrop={handleDropNewBars}
                 key={x + "__comparison"}

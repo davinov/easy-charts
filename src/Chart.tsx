@@ -59,7 +59,7 @@ function generateScaleBand(dataWithSchema: DataWithSchema, column?: string) {
     }
 }
 
-function generateScaleLinear(dataWithSchema: DataWithSchema, column?: string) {
+function generateScaleLinear(dataWithSchema: DataWithSchema, column?: string, comparisonColumn?: string) {
     if (!column) {
         return;
     }
@@ -68,6 +68,11 @@ function generateScaleLinear(dataWithSchema: DataWithSchema, column?: string) {
 
     if (type === ColumnType.NUMERIC) {
         const values = dataWithSchema.data.map((d) => d[column]) as number[];
+        if (comparisonColumn) {
+          values.push(
+            ...(dataWithSchema.data.map((d) => d[comparisonColumn]) as number[])
+          );
+        }
         return scaleLinear([0, 100]).domain([
           Math.min(0, ...values),
           Math.max(0, ...values),
@@ -125,7 +130,8 @@ export function Chart({ dataWithSchema }: ChartProps) {
   ]);
 
   const valueScale = useMemo(
-    () => generateScaleLinear(dataWithSchema, chartConfig.value),
+    () =>
+      generateScaleLinear(dataWithSchema, chartConfig.value, chartConfig.comparison),
     [dataWithSchema, chartConfig.value]
   );
 
