@@ -1,7 +1,9 @@
 import styled, {css} from 'styled-components';
 import { CurrentColumnDraggedContext } from './ColumDraggedProvider';
 import { Axis } from './Axis';
-import { ReactNode, useContext, useState } from 'react';
+import { ReactNode, useContext, useMemo, useState } from 'react';
+import { scaleBand, scaleOrdinal } from 'd3-scale';
+import { ColumnType } from './column-type';
 
 
 const OrthonormalLayout = styled.div`
@@ -50,39 +52,66 @@ interface ChartConfig {
     y?: string;
 }
 
-export function Chart({data}) {
-    const [currentDraggedColumn] = useContext(CurrentColumnDraggedContext)
-    // const maxAge = Math.max(...data.map(item => item.age));
+interface DataWithSchema {
+    schema: {name: string; type: ColumnType}[];
+    data: {[col: string]: string | number | Date }[];
+}
 
-    const [chartConfig, setChartConfig] = useState<ChartConfig>({});
-    
-    function setXAxisColumn() {
-      setChartConfig({
-        ...chartConfig,
-        x: currentDraggedColumn?.name,
-      });
+function generateScale(dataWithSchema: DataWithSchema, column?: string) {
+    if (!column) {
+        return;
     }
 
-    function setYAxisColumn() {
-      setChartConfig({
-        ...chartConfig,
-        y: currentDraggedColumn?.name,
-      });
+    const type = dataWithSchema.schema.find((c) => c.name === column)?.type;
+
+    if (type === ColumnType.TEXT) {
+        const values = dataWithSchema.data.map((d) => d[column]) as string[];
+        return scaleBand([0, 100]).domain(values);
     }
+}
 
-    return (
-      <ChartDiv>
-        <div>{JSON.stringify(chartConfig)}</div>
-        <OrthonormalLayout>
-          <XAxisContainer>
-            <Axis placeholder="X axis" onColumnChange={setXAxisColumn} />
-          </XAxisContainer>
-          <YAxisContainer>
-            <Axis placeholder="Y axis" onColumnChange={setYAxisColumn} />
-          </YAxisContainer>
-        </OrthonormalLayout>
+interface ChartProps {
+  dataWithSchema: DataWithSchema;
+}
 
-        {/* <BarChart>
+export function Chart({ dataWithSchema }: ChartProps) {
+  const [currentDraggedColumn] = useContext(CurrentColumnDraggedContext);
+  // const maxAge = Math.max(...data.map(item => item.age));
+
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({});
+
+  function setXAxisColumn() {
+    setChartConfig({
+      ...chartConfig,
+      x: currentDraggedColumn?.name,
+    });
+  }
+
+  function setYAxisColumn() {
+    setChartConfig({
+      ...chartConfig,
+      y: currentDraggedColumn?.name,
+    });
+  }
+
+  const xScale = useMemo(() => generateScale(dataWithSchema, chartConfig.x), [
+    dataWithSchema,
+    chartConfig.x,
+  ]);
+
+  return (
+    <ChartDiv>
+      <div>{JSON.stringify(chartConfig)}</div>
+      <OrthonormalLayout>
+        <XAxisContainer>
+          <Axis placeholder="X axis" onColumnChange={setXAxisColumn} scale={xScale} />
+        </XAxisContainer>
+        <YAxisContainer>
+          <Axis placeholder="Y axis" onColumnChange={setYAxisColumn} />
+        </YAxisContainer>
+      </OrthonormalLayout>
+
+      {/* <BarChart>
                 {data.map(item => (
                     <Bar
                         key={item.name}
@@ -102,6 +131,6 @@ export function Chart({data}) {
                     <div key={item.name}>{item.name}</div>
                 ))}
             </XAxis> */}
-      </ChartDiv>
-    );
+    </ChartDiv>
+  );
 }

@@ -25,7 +25,7 @@ function App() {
           value={[currentDraggedColumn, setCurrentDraggedColumn]}
         >
           <ColumnsList columns={SAMPLE_DATA.schema}></ColumnsList>
-          <Chart data={SAMPLE_DATA.data}></Chart>
+          <Chart dataWithSchema={SAMPLE_DATA}></Chart>
         </CurrentColumnDraggedContext.Provider>
       </ChartEditorLayout>
     </>

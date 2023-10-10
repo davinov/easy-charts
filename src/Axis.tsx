@@ -1,6 +1,7 @@
 import { CurrentColumnDraggedContext } from "./ColumDraggedProvider";
 import styled, { css } from "styled-components";
 import { useContext, useState } from "react";
+import { ScaleBand, scaleBand, scaleOrdinal } from 'd3-scale';
 
 const AxisPlaceholder = styled.div<{ $isDraggedOver: boolean }>`
   background: lightgray;
@@ -17,13 +18,30 @@ const AxisPlaceholder = styled.div<{ $isDraggedOver: boolean }>`
     `}
 `;
 
+
 interface AxisProps {
   placeholder: string;
   onColumnChange: (column: string) => void;
-  column: string;
+  scale?: ScaleBand<string>;
 }
 
-export function Axis({ placeholder, onColumnChange }: AxisProps) {
+const AxisLabelsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  position: relative;
+`;
+
+const AxisLabel = styled.div<{ $width: number; $left?: number }>`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: absolute;
+  width: ${({ $width }) => $width + "%"};
+  left: ${({ $left }) => $left + "%"};
+`;
+
+
+export function Axis({ placeholder, onColumnChange, scale }: AxisProps) {
   const [currentDraggedColumn] = useContext(CurrentColumnDraggedContext);
 
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
@@ -40,8 +58,8 @@ export function Axis({ placeholder, onColumnChange }: AxisProps) {
     setIsDraggedOver(true);
   }
 
-  return (
-    <AxisPlaceholder
+  if (!scale) {
+    return <AxisPlaceholder
       $isDraggedOver={isDraggedOver}
       onDragOver={handleDragOver}
       onDragLeave={() => setIsDraggedOver(false)}
@@ -49,5 +67,15 @@ export function Axis({ placeholder, onColumnChange }: AxisProps) {
     >
       {placeholder}
     </AxisPlaceholder>
+  }
+
+  return (
+    <AxisLabelsContainer>
+      {scale.domain().map((label) => (
+        <AxisLabel $width={scale.bandwidth()} $left={scale(label)}>
+          {label}
+        </AxisLabel>
+      ))}
+    </AxisLabelsContainer>
   );
 };
