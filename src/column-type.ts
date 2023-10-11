@@ -1,5 +1,11 @@
 export enum ColumnType {
-  TEXT = "TEXT",
-  NUMERIC = "NUMERIC",
-  DATE = "DATE",
+  TEXT = "text",
+  NUMERIC = "numeric",
+  DATE = "date",
+}
+
+export enum ColumnEmoji {
+  "text" = "📚",
+  "numeric" = "🔢",
+  "date" = "🗓️",
 }
